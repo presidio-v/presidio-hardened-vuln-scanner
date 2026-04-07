@@ -1,0 +1,70 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "presidio-hardened-vuln-scanner"
+version = "0.1.0"
+description = "OWASP-focused web vulnerability scanner with vulnerable and fixed Flask apps for lab exercises"
+readme = "README.md"
+license = "MIT"
+requires-python = ">=3.10"
+authors = [{ name = "Vladimir Stantchev" }]
+keywords = ["security", "owasp", "scanner", "sqli", "xss", "csrf", "presidio"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Education",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Security",
+]
+dependencies = [
+    "requests>=2.31",
+    "beautifulsoup4>=4.12",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.4",
+    "pytest-cov>=4.1",
+    "ruff>=0.4",
+    "flask>=2.3",
+    "flask-wtf>=1.2",
+    "flask-talisman>=1.1",
+    "argon2-cffi>=23.1",
+]
+
+[project.urls]
+Homepage = "https://github.com/presidio-v/presidio-hardened-vuln-scanner"
+Repository = "https://github.com/presidio-v/presidio-hardened-vuln-scanner"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/presidio_vuln_scanner"]
+
+[tool.ruff]
+target-version = "py310"
+line-length = 99
+src = ["src"]
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "N", "UP", "S", "B", "A", "C4", "SIM"]
+ignore = ["S101", "S311", "S501", "S113"]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/**/*.py" = ["S101", "S105", "S106"]
+"vulnerable_app/**/*.py" = ["S101", "S105", "S106", "S108", "S301", "S307", "S311", "S324", "S501", "S602", "S603", "S605", "S608", "S701", "B006", "UP"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "--tb=short -q"
+
+[tool.coverage.run]
+source = ["src"]
+branch = true
+
+[tool.coverage.report]
+fail_under = 80
+show_missing = true
