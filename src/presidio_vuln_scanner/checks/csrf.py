@@ -32,7 +32,7 @@ def check(target: str) -> list[dict]:
                         "check": "csrf",
                         "severity": "MEDIUM",
                         "url": url,
-                        "method": method,
+                        "param": method,
                         "payload": None,
                         "evidence": f"POST accepted without CSRF token, status={resp.status_code}",
                         "description": (
