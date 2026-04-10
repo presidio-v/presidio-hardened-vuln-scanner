@@ -24,9 +24,10 @@ def check(target: str) -> list[dict]:
                 "input",
                 attrs={"name": lambda n: n and "csrf" in n.lower()},
             )
-            has_403 = resp.status_code == 403
+            # 400 = Flask-WTF default CSRF rejection; 403 = some other frameworks
+            is_rejected = resp.status_code in (400, 403)
 
-            if not csrf_inputs and not has_403 and resp.status_code < 500:
+            if not csrf_inputs and not is_rejected and resp.status_code < 500:
                 findings.append(
                     {
                         "check": "csrf",

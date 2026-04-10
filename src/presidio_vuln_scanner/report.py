@@ -92,8 +92,14 @@ def report_compare(name_a: str, name_b: str) -> None:
         delta = cb.get(sev, 0) - ca.get(sev, 0)
         print(f"  {sev:<10} {ca.get(sev, 0):>8} {cb.get(sev, 0):>8} {delta:>+8}")
     print()
+    high_reduced = cb.get("HIGH", 0) < ca.get("HIGH", 0)
     if cb.get("HIGH", 0) == 0:
         print("  Result: PASS — zero HIGH findings in fixed app.")
+    elif high_reduced:
+        print(
+            f"  Result: PARTIAL — HIGH reduced {ca['HIGH']}→{cb['HIGH']}. "
+            "Remaining findings may include scanner false positives (e.g. javascript: XSS, HSTS)."
+        )
     else:
         print("  Result: FAIL — HIGH findings remain in fixed app.")
     print()

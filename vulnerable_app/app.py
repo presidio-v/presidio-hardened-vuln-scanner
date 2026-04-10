@@ -68,8 +68,6 @@ def search():
         rows = conn.execute(sql).fetchall()  # noqa: S608
     except Exception as e:
         return f"<p>Error: {e}</p>", 500
-    finally:
-        conn.close()
     results = "".join(f"<li>{r['username']}: ${r['balance']}</li>" for r in rows)
     return f"<ul>{results}</ul>" if results else "<p>No results</p>"
 
@@ -103,7 +101,6 @@ def register():
         "INSERT INTO users (username, password, balance) VALUES (?, ?, 0)", (username, hashed)
     )
     conn.commit()
-    conn.close()
     return f"<p>Registered {username}</p>"
 
 
@@ -126,6 +123,7 @@ def debug():
     return f"<p>{expr} = {value}</p>"
 
 
+init_db()
+
 if __name__ == "__main__":
-    init_db()
     app.run(host="127.0.0.1", port=5000, debug=False)
