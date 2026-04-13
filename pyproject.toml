@@ -23,7 +23,7 @@ classifiers = [
 ]
 dependencies = [
     "requests>=2.31",
-    "beautifulsoup4>=4.12",
+    "beautifulsoup4>=4.14.3",
 ]
 
 [project.optional-dependencies]
