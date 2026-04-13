@@ -34,7 +34,7 @@ dev = [
     "flask>=2.3",
     "flask-wtf>=1.2",
     "flask-talisman>=1.1",
-    "argon2-cffi>=23.1",
+    "argon2-cffi>=25.1.0",
 ]
 
 [project.urls]
