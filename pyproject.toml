@@ -22,7 +22,7 @@ classifiers = [
     "Topic :: Security",
 ]
 dependencies = [
-    "requests>=2.31",
+    "requests>=2.33.1",
     "beautifulsoup4>=4.12",
 ]
 
