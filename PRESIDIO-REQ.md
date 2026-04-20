@@ -57,3 +57,8 @@ external database dependency. This means the app resets its state on each
 restart, which is fine for the exercise.
 
 <!-- Deliver the complete working project ready for GitHub publish. -->
+
+## SDLC
+
+These requirements are delivered under the family-wide Presidio SDLC:
+<https://github.com/presidio-v/presidio-hardened-docs/blob/main/sdlc/sdlc-report.md>.
