@@ -1,11 +1,11 @@
 [build-system]
-requires = ["hatchling"]
+requires = ["hatchling", "tomli; python_version < '3.11'"]
 build-backend = "hatchling.build"
 
 [project]
 name = "presidio-hardened-vuln-scanner"
 version = "0.1.0"
-description = "OWASP-focused web vulnerability scanner with vulnerable and fixed Flask apps for lab exercises"
+description = "OWASP-focused web vulnerability scanner with vulnerable and fixed Flask apps for lab exercises. Independent of Microsoft Presidio (a data-anonymization toolkit)."
 readme = "README.md"
 license = "MIT"
 requires-python = ">=3.10"
