@@ -1,5 +1,8 @@
 version: 2
 updates:
+  # Only the repository root is scanned. `vulnerable_app/requirements.txt` pins
+  # outdated dependencies on purpose (see README.md) — do NOT add it here, or
+  # Dependabot will silently dismantle the lab exercise.
   - package-ecosystem: pip
     directory: "/"
     schedule:
@@ -16,6 +19,13 @@ updates:
       interval: weekly
       day: monday
     open-pull-requests-limit: 5
+    # A single grouped PR per week. Multi-action releases (e.g. the three
+    # github/codeql-action/* sub-actions pinned in codeql.yml) otherwise arrive
+    # as separate PRs that all edit the same lines and mutually conflict.
+    groups:
+      github-actions:
+        patterns:
+          - "*"
     labels:
       - dependencies
       - ci
