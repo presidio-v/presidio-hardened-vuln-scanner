@@ -4,9 +4,10 @@ Security fixes applied:
   - Secret key loaded from environment variable (not hardcoded)
   - eval() replaced with ast.literal_eval() limited to safe expressions
   - subprocess removed; admin route disabled
-  - Argon2id password hashing (replaces MD5)
+  - Argon2id password hashing (replaces MD5); Werkzeug scrypt when argon2 is absent
   - Parameterized SQL queries (eliminates SQLi)
-  - Jinja2 template with autoescaping (eliminates reflected XSS)
+  - Jinja2 template with autoescaping, and escape() on every value echoed in
+    an f-string response (eliminates reflected XSS)
   - CSRF protection via Flask-WTF
   - HTTP security headers via Flask-Talisman
 """
@@ -18,6 +19,8 @@ import sqlite3
 from flask import Flask, abort, render_template_string, request
 from flask_talisman import Talisman
 from flask_wtf.csrf import CSRFProtect, generate_csrf
+from markupsafe import escape
+from werkzeug.security import generate_password_hash
 
 try:
     from argon2 import PasswordHasher
@@ -63,9 +66,8 @@ def init_db() -> None:
 def _hash_password(password: str) -> str:
     if _HAS_ARGON2:
         return _ph.hash(password)
-    import hashlib
-
-    return hashlib.sha256(password.encode()).hexdigest()
+    # Never fall back to a fast unsalted hash: Werkzeug's default is salted scrypt.
+    return generate_password_hash(password)
 
 
 @app.route("/")
@@ -80,8 +82,7 @@ def search():
     rows = conn.execute(
         "SELECT username, balance FROM users WHERE username = ?", (query,)
     ).fetchall()
-    conn.close()
-    results = "".join(f"<li>{r['username']}: ${r['balance']}</li>" for r in rows)
+    results = "".join(f"<li>{escape(r['username'])}: ${escape(r['balance'])}</li>" for r in rows)
     return f"<ul>{results}</ul>" if results else "<p>No results</p>"
 
 
@@ -104,7 +105,7 @@ def transfer():
         )
     amount = request.form.get("amount", "0")
     to_user = request.form.get("to", "")
-    return f"<p>Transferred ${amount} to {to_user} (CSRF token validated)</p>"
+    return f"<p>Transferred ${escape(amount)} to {escape(to_user)} (CSRF token validated)</p>"
 
 
 @app.route("/register", methods=["POST"])
@@ -123,9 +124,7 @@ def register():
         conn.commit()
     except sqlite3.IntegrityError:
         return "<p>Username already exists</p>", 409
-    finally:
-        conn.close()
-    return f"<p>Registered {username}</p>"
+    return f"<p>Registered {escape(username)}</p>"
 
 
 @app.route("/debug")
@@ -133,9 +132,10 @@ def debug():
     expr = request.args.get("expr", "1+1")
     try:
         value = ast.literal_eval(expr)
-    except (ValueError, SyntaxError) as e:
-        return f"<p>Invalid expression: {e}</p>", 400
-    return f"<p>{expr} = {value}</p>"
+    except (ValueError, SyntaxError):
+        # The parser message echoes the input and internals; return a fixed error.
+        return "<p>Invalid expression</p>", 400
+    return f"<p>{escape(expr)} = {escape(value)}</p>"
 
 
 if __name__ == "__main__":
