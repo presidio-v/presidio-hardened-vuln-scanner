@@ -37,6 +37,7 @@ use. It must never be deployed to a network-accessible server.
 | **Argon2id** | Password hashing in fixed app |
 | **Parameterized SQL** | All queries use `?` placeholders in fixed app |
 | **Security logging** | Structured events for scan and exploit operations |
+| **Dependency audit** | Blocking `pip-audit` in CI on every PR and push to `main`, over the scanner package and `fixed_app/requirements.txt`; `vulnerable_app/` is intentionally excluded |
 
 ## Software Development Lifecycle
 
