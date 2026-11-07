@@ -57,6 +57,12 @@ def init_db() -> None:
         "CREATE TABLE IF NOT EXISTS users "
         "(id INTEGER PRIMARY KEY, username TEXT UNIQUE, password TEXT, balance REAL)"
     )
+    # Same demo users as vulnerable_app, so a benign search returns a row (positive control).
+    for uid, name, balance in ((1, "alice", 100.0), (2, "admin", 9999.0)):
+        conn.execute(
+            "INSERT OR IGNORE INTO users (id, username, password, balance) VALUES (?, ?, ?, ?)",
+            (uid, name, _hash_password(f"demo-{name}"), balance),
+        )
     conn.commit()
 
 
@@ -80,7 +86,6 @@ def search():
     rows = conn.execute(
         "SELECT username, balance FROM users WHERE username = ?", (query,)
     ).fetchall()
-    conn.close()
     results = "".join(f"<li>{r['username']}: ${r['balance']}</li>" for r in rows)
     return f"<ul>{results}</ul>" if results else "<p>No results</p>"
 
@@ -123,8 +128,6 @@ def register():
         conn.commit()
     except sqlite3.IntegrityError:
         return "<p>Username already exists</p>", 409
-    finally:
-        conn.close()
     return f"<p>Registered {username}</p>"
 
 
@@ -138,6 +141,9 @@ def debug():
     return f"<p>{expr} = {value}</p>"
 
 
+# Initialise at import: the lab starts the app with `from fixed_app.app import app`, which
+# never runs the __main__ block. The connection is shared, so no route may close it.
+init_db()
+
 if __name__ == "__main__":
-    init_db()
     app.run(host="127.0.0.1", port=5001, debug=False)
