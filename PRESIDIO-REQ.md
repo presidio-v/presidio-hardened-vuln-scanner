@@ -28,7 +28,7 @@ Experiment 3 of PRES-EDU-SEC-101 (Computer Security). It ships:
 - `src/presidio_vuln_scanner/` layout with `checks/` subpackage
 - pytest ≥80% coverage
 - ruff lint + format enforced
-- MIT License, version 0.1.0
+- MIT License, version 0.1.2
 
 ## Intentional Vulnerabilities in vulnerable_app/
 
@@ -55,6 +55,19 @@ not in having an exhaustive scanner.
 **Scope decision:** The vulnerable app uses SQLite in-memory to avoid any
 external database dependency. This means the app resets its state on each
 restart, which is fine for the exercise.
+### v0.1.1 — fixed_app database lifecycle (release/0.1.x)
+
+**Fix:** `fixed_app` now initialises its database at import (the lab starts it with
+`from fixed_app.app import app`), seeds the `vulnerable_app` demo users so a benign search is
+a positive control, and no route closes the shared connection. Before, every `/search` on the
+fixed app returned 500, and a scan reported it SQLi-clean for the wrong reason. Output escaping
+is deliberately unchanged on this line: the course's adversarial step teaches those sinks.
+
+### v0.1.2 — main after v0.1.1
+
+**Version decision:** `main` carries the same database fix plus output escaping on every
+`fixed_app` response. It is versioned above the 0.1.1 already on PyPI; the packaged scanner
+(`src/`) is unchanged since 0.1.0.
 
 <!-- Deliver the complete working project ready for GitHub publish. -->
 
