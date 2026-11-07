@@ -60,6 +60,12 @@ def init_db() -> None:
         "CREATE TABLE IF NOT EXISTS users "
         "(id INTEGER PRIMARY KEY, username TEXT UNIQUE, password TEXT, balance REAL)"
     )
+    # Same demo users as vulnerable_app, so a benign search returns a row (positive control).
+    for uid, name, balance in ((1, "alice", 100.0), (2, "admin", 9999.0)):
+        conn.execute(
+            "INSERT OR IGNORE INTO users (id, username, password, balance) VALUES (?, ?, ?, ?)",
+            (uid, name, _hash_password(f"demo-{name}"), balance),
+        )
     conn.commit()
 
 
@@ -138,6 +144,9 @@ def debug():
     return f"<p>{escape(expr)} = {escape(value)}</p>"
 
 
+# Initialise at import: the lab starts the app with `from fixed_app.app import app`, which
+# never runs the __main__ block.
+init_db()
+
 if __name__ == "__main__":
-    init_db()
     app.run(host="127.0.0.1", port=5001, debug=False)
