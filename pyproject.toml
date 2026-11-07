@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "presidio-hardened-vuln-scanner"
-version = "0.1.0"
+version = "0.1.2"
 description = "OWASP-focused web vulnerability scanner with vulnerable and fixed Flask apps for lab exercises. Independent of Microsoft Presidio (a data-anonymization toolkit)."
 readme = "README.md"
 license = "MIT"
